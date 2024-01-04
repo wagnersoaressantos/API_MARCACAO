@@ -1,0 +1,73 @@
+**1. Identificação das Entidades Principais:**
+   - Pacientes
+   - Médicos
+   - Consultas
+   - Receitas
+   - Exames
+
+**2. Tabelas do Banco de Dados:**
+
+   a. Tabela `Pacientes`:
+      - ID_Paciente (Chave Primária)
+      - Nome
+      - Data de Nascimento
+      - Sexo
+      - Endereço
+      - Contato
+
+   b. Tabela `Médicos`:
+      - ID_Medico (Chave Primária)
+      - Nome
+      - Especialidade
+      - CRM (Conselho Regional de Medicina)
+      - Contato
+
+   c. Tabela `Consultas`:
+      - ID_Consulta (Chave Primária)
+      - ID_Paciente (Chave Estrangeira referenciando a tabela `Pacientes`)
+      - ID_Medico (Chave Estrangeira referenciando a tabela `Médicos`)
+      - Data e Hora da Consulta
+      - Diagnóstico
+      - Observações
+
+   d. Tabela `Receitas`:
+      - ID_Receita (Chave Primária)
+      - ID_Consulta (Chave Estrangeira referenciando a tabela `Consultas`)
+      - Medicamentos Prescritos
+      - Posologia
+      - Instruções Adicionais
+
+   e. Tabela `Exames`:
+      - ID_Exame (Chave Primária)
+      - ID_Consulta (Chave Estrangeira referenciando a tabela `Consultas`)
+      - Tipo de Exame
+      - Resultados
+      - Observações
+
+**3. Relacionamentos:**
+
+   - A tabela `Consultas` está relacionada com as tabelas `Pacientes` e `Médicos` por meio das chaves estrangeiras `ID_Paciente` e `ID_Medico`, respectivamente.
+   - A tabela `Receitas` está relacionada com a tabela `Consultas` por meio da chave estrangeira `ID_Consulta`.
+   - A tabela `Exames` está relacionada com a tabela `Consultas` por meio da chave estrangeira `ID_Consulta`.
+
+**4. Funcionalidades do Sistema:**
+
+   - Cadastro de Pacientes, Médicos e Consultas.
+   - Registro de Receitas e Exames associados a uma consulta.
+   - Busca de informações de pacientes, médicos e histórico de consultas.
+   - Geração de relatórios, como histórico médico de um paciente, lista de consultas agendadas, etc.
+
+**5. Interface do Usuário:**
+
+   - Páginas para cadastro e visualização de pacientes, médicos e consultas.
+   - Formulários para registrar receitas e exames durante uma consulta.
+   - Páginas de busca e relatórios para acessar informações específicas.
+
+**6. Tecnologias Recomendadas:**
+
+   - Banco de dados relacional (por exemplo, MySQL, PostgreSQL).
+   - Linguagem de programação (por exemplo, Python, Java).
+   - Framework para desenvolvimento web (por exemplo, Django, Flask para Python).
+   - HTML, CSS, JavaScript para a interface do usuário.
+
+Este é apenas um exemplo básico e pode ser expandido de acordo com os requisitos específicos do sistema de postos de saúde. Certifique-se de considerar aspectos de segurança, como a proteção de dados sensíveis dos pacientes, e cumprir as regulamentações locais de saúde ao desenvolver o sistema.
