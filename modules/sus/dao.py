@@ -3,7 +3,7 @@ from modules.sus.sql import SQLSus
 from service.connect import Connect
 
 
-class DAOPaciente(SQLSus):
+class DAOSus(SQLSus):
     def __init__(self):
         self.connection = Connect().get_instance()
 

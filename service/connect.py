@@ -1,8 +1,5 @@
 import psycopg2
 
-
-
-
 class Connect:
     def __init__(self):
         config = dict(
@@ -17,9 +14,10 @@ class Connect:
     def create_tables(self):
         from modules.demanda.dao import DAODemanda
         from modules.paciente.dao import DAOPaciente
+        from modules.sus.dao import DAOSus
         cursor = self._connection.cursor()
         cursor.execute(DAOPaciente().create_table())
-        cursor.execute(DAOPaciente().create_table_historico_sus())
+        cursor.execute(DAOSus().create_table())
         cursor.execute(DAODemanda().create_table())
         self._connection.commit()
         cursor.close()
