@@ -9,18 +9,31 @@ dao_demanda = DAODemanda()
 module_name = 'demanda'
 
 def get_demanda():
-    # if(id):
-    #     demandas = dao_demanda.get_by_id()
-    #     results = [demanda.__dict__ for demanda in demandas]
-    #     response = jsonify(results)
-    #     response.status_code = 200
-    #     return response
-
     demandas = dao_demanda.get_all()
     results = [demanda.__dict__ for demanda in demandas]
     response = jsonify(results)
     response.status_code = 200
     return response
+
+def get_demanda_by_nome(demanda):
+    demandas = dao_demanda.get_by_demanda(demanda)
+    results = [demanda.__dict__ for demanda in demandas]
+    response = jsonify(results)
+    response.status_code = 200
+    return response
+
+def delete_demanda_by_nome(demanda):
+    dao_demanda.delete_by_demanda(demanda)
+    response = jsonify({"message": "Demanda deletada com sucesso!"})
+    response.status_code = 200
+    return response
+
+
+def buscar_demanda(demanda = None):
+
+    if demanda:
+        return get_demanda_by_nome(demanda)
+    return get_demanda()
 
 def create_demanda():
     demandas = request.json
@@ -52,6 +65,21 @@ def get_or_create_demanda():
     else:
         return create_demanda()
 
-# @demanda_controller.route(f'/{module_name}/<id>', methods = ['GET', 'POST'])
-# def get_demanada_by_id(id:int):
-#     return get_demanda(id)
+@demanda_controller.route(f'/{module_name}/buscar/', methods = ['GET'])
+def get_buscar_demanda():
+    demanda = request.args.get('demanda')
+    print("buscar demanda:===",demanda)
+
+
+    results = buscar_demanda(demanda)
+    return results
+
+@demanda_controller.route(f'/{module_name}/deletar/', methods = ['DELETE'])
+def delete_demanda():
+    demanda = request.args.get('demanda')
+    print("buscar demanda:===",demanda)
+    existe_demande = buscar_demanda(demanda)
+    if not existe_demande:
+        return "Demanda não encontrada"
+    results = delete_demanda_by_nome(demanda)
+    return results

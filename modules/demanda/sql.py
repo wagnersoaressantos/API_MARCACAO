@@ -11,4 +11,4 @@ class SQLDemanda:
     _INSERTO_INTO = f'INSERT INTO {_TABLE_NAME}({_COL_DEMANDA}) values(%s)'
     _SELECT_BY_DEMANDA = f'SELECT * from {_TABLE_NAME} where {_COL_DEMANDA} ilike %s'
     _SELECT_ALL = f'SELECT * from {_TABLE_NAME}'
-    # _SELECT_BY_ID = f'SELECT * from {_TABLE_NAME} where {_COL_ID} ilike %s'
+    _DELETE_BY_DEMANDA =f'DELETE from {_TABLE_NAME} where {_COL_DEMANDA} ilike %s'

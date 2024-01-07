@@ -29,15 +29,13 @@ class DAODemanda(SQLDemanda):
         results = [Demanda(**i) for i in results]
         return results
 
-    # def get_by_id(self, id):
-    #     query = self._SELECT_BY_ID
-    #     cursor = self.connection.cursor()
-    #     cursor.execute(query, (id))
-    #     results = cursor.fetchall()
-    #     cols = [desc[0] for desc in cursor.description]
-    #     results = [dict(zip(cols, i)) for i in results]
-    #     results = [Demanda(**i) for i in results]
-    #     return  results
+    def delete_by_demanda(self, demanda):
+        query = self._DELETE_BY_DEMANDA
+        cursor = self.connection.cursor()
+        cursor.execute(query, (demanda,))
+        self.connection.commit()
+        return
+
 
     def get_all(self):
         query = self._SELECT_ALL
