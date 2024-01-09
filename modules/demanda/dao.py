@@ -36,6 +36,16 @@ class DAODemanda(SQLDemanda):
         self.connection.commit()
         return
 
+    def get_id_by_demanda(self, demanda):
+        query = self._SELECT_ID_BY_DEMANDA
+        cursor = self.connection.cursor()
+        cursor.execute(query, (demanda,))
+        result = cursor.fetchone()
+        if result:
+            return result[0]
+        else:
+            return None
+
 
     def get_all(self):
         query = self._SELECT_ALL

@@ -16,6 +16,7 @@ class SQLSus:
                                   f'{_COL_DATA_FINAL} TIMESTAMP,' \
                                   f'CONSTRAINT unique_sus_por_paciente UNIQUE ({_COL_SUS}, {_COL_PACIENTE_ID}));'
 
-    _INSERTO_INTO = f'INSERT INTO sus_historico ({_COL_SUS}, {_COL_PACIENTE_ID}, {_COL_DATA_INICIO}) values (%s, %s, %s);'
+    _INSERTO_INTO = f'INSERT INTO sus_historico ({_COL_SUS}, {_COL_PACIENTE_ID}, {_COL_DATA_INICIO}, {_COL_DATA_FINAL}) values (%s, %s, %s, %s);'
     _SELECT_BY_SUS = f'SELECT p.* from {_TABLE_NAME_PACIENTE} p INNER JOIN {_TABLE_NAME} h ON p.{_COL_ID} = h.{_COL_PACIENTE_ID} WHERE h.{_COL_SUS} ILIKE %s'
     _SELECT_ALL = f'SELECT * from {_TABLE_NAME}'
+    _SELECT_BY_SUS_ID = f'SELECT p.* from {_TABLE_NAME_PACIENTE} p INNER JOIN {_TABLE_NAME} h ON p.{_COL_ID} = h.{_COL_PACIENTE_ID} WHERE h.{_COL_PACIENTE_ID} = %s'

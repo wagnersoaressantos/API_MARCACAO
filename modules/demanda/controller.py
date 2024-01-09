@@ -57,7 +57,6 @@ def create_demanda():
     return response
 
 
-
 @demanda_controller.route(f'/{module_name}/', methods = ['GET', 'POST'])
 def get_or_create_demanda():
     if request.method == 'GET':
