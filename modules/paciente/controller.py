@@ -43,6 +43,48 @@ def create_paciente():
     response.status_code = 201
     return response
 
+def atualizar_paciente():
+    pacientes = request.json
+    print("paciente a atualizar: ", pacientes)
+    for data in pacientes:
+        if'cpf' in data:
+            if data.get('cpf')!="":
+                print('pegando id')
+                id = comuns_controller.get_id_paciente_by_cpf(data.get('cpf'))
+                print('id: ',id)
+                print('atualizando paciente com id: ',id)
+                paciente_novo = Paciente(data.get('nome'), data.get('mae'), data.get('data_nasc'), data.get('pai'), id)
+                print(f'nova paciente para atualizar: {paciente_novo}')
+                dao_paciente.atualizar(paciente_novo)
+            else:
+                response = jsonify("Informe o CPF")
+                return response
+        else:
+            response = jsonify("Informe o CPF para relizar a atualização")
+            return response
+    print(f'paciente atualizado')
+    response = jsonify("sucesso na atualização")
+    return response
+
+def delete_paciente(cpf):
+    id = comuns_controller.get_id_paciente_by_cpf(cpf)
+    if not id:
+        response = jsonify({"message":"Paciente não encontrado!"})
+        response.status_code = 404
+        return response
+    dao_paciente.delete_paciente_by_id(id)
+    response = jsonify({"message": "Paciente deletado com sucesso!"})
+    response.status_code = 200
+    return response
+#     if 'sus' in pacientes:
+#         paciente_info = {k: v for k, v in pacientes.items() if k!='sus'}
+#         paciente = buscar_paciente(paciente_info.get('cpf'))
+#         paciente_id = paciente[0]
+#         print(paciente_id)
+#         if not paciente:
+#             paciente = create_paciente(paciente_info)
+#             paciente_id = paciente
+
 def get_paciente():
     pacientes = dao_paciente.get_all()
     results = [paciente.__dict__ for paciente in pacientes]
@@ -105,17 +147,6 @@ def get_paciente_by_data_nasc(data_nasc):
 #     response.status_code = 200
 #     return response
 
-# def criar_atualizar_paciente():
-#     pacientes = request.json
-#     if 'sus' in pacientes:
-#         paciente_info = {k: v for k, v in pacientes.items() if k!='sus'}
-#         paciente = buscar_paciente(paciente_info.get('cpf'))
-#         paciente_id = paciente[0]
-#         print(paciente_id)
-#         if not paciente:
-#             paciente = create_paciente(paciente_info)
-#             paciente_id = paciente
-#
 def buscar_paciente(nome = None, mae = None, sus = None, data_nasc = None, cpf = None):
 
     if nome:
@@ -137,6 +168,10 @@ def get_or_create_paciente():
         print("criar paciente")
         return create_paciente()
 
+@paciente_controller.route(f'/{module_name}/atualizar/', methods = ['POST'])
+def get_atualizar_paciente():
+    print("entrou no atualizar paciente")
+    return atualizar_paciente()
 # # def get_or_create_sus():
 # #    print("pegando sus sus")
 # #    if request.method == 'GET':
@@ -156,16 +191,15 @@ def get_buscar_paciente():
     #cria um dicionario
     params = {'nome':nome, 'mae':mae, 'sus':sus, 'data_nasc':data_nasc, 'cpf':cpf}
     params = {chave: valor for chave, valor in params.items() if valor is not None}
-    print('parametros de busca: ', params)
 
     results = buscar_paciente(**params)
     return results
-#
-# @paciente_controller.route(f'/{module_name}/pegar/', methods = ['GET'])
-# def get_id_paciente_por_cpf():
-#     cpf = request.args.get('cpf')
-#     print('cpf= ', cpf)
-#     id = get_id_by_cpf(cpf)
-#     if id is not None:
-#         response = jsonify(f'paciente encontrado id : {id}')
-#         response.status_code=200
+
+@paciente_controller.route(f'/{module_name}/deletar/', methods = ['DELETE'])
+def delete_demanda():
+    cpf = request.args.get('cpf')
+    param = {'cpf':cpf}
+    paciente = buscar_paciente(**param)
+    print(paciente)
+    results = delete_paciente(cpf)
+    return results

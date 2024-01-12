@@ -19,6 +19,22 @@ class DAOPaciente(SQLPaciente):
         self.connection.commit()
         return paciente
 
+    def atualizar(self, paciente: Paciente):
+        if not isinstance(paciente, Paciente):
+            raise Exception("Tipo inválido")
+        query = self._UPDATE_PACIENTE
+        cursor = self.connection.cursor()
+        cursor.execute(query,(paciente.nome, paciente.mae, paciente.pai, paciente.data_nasc, paciente.id))
+        self.connection.commit()
+        return paciente
+
+    def delete_paciente_by_id(self, id):
+        query = self._DELETE_BY_ID
+        cursor = self.connection.cursor()
+        cursor.execute(query, (id,))
+        self.connection.commit()
+
+
     def get_all(self):
         query = self._SELECT_ALL
         cursor = self.connection.cursor()
@@ -90,6 +106,7 @@ class DAOPaciente(SQLPaciente):
             return result[0]
         else:
             return None
+
     def get_by_id(self, paciente_id):
         query = self._SELECT_BY_ID
         cursor = self.connection.cursor()
