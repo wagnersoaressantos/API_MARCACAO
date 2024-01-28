@@ -12,11 +12,14 @@ class SQLSus:
                                   f'(id serial PRIMARY KEY,' \
                                   f'{_COL_SUS} varchar(15) unique,' \
                                   f'{_COL_PACIENTE_ID} integer references {_TABLE_NAME}({_COL_ID}),' \
-                                  f'{_COL_DATA_INICIO} TIMESTAMP DEFAULT CURRENT_TIMESTAMP,' \
-                                  f'{_COL_DATA_FINAL} TIMESTAMP,' \
+                                  f'{_COL_DATA_INICIO} varchar(10),' \
+                                  f'{_COL_DATA_FINAL} varchar(10),' \
                                   f'CONSTRAINT unique_sus_por_paciente UNIQUE ({_COL_SUS}, {_COL_PACIENTE_ID}));'
 
     _INSERTO_INTO = f'INSERT INTO sus_historico ({_COL_SUS}, {_COL_PACIENTE_ID}, {_COL_DATA_INICIO}, {_COL_DATA_FINAL}) values (%s, %s, %s, %s);'
-    _SELECT_BY_SUS = f'SELECT p.* from {_TABLE_NAME_PACIENTE} p INNER JOIN {_TABLE_NAME} h ON p.{_COL_ID} = h.{_COL_PACIENTE_ID} WHERE h.{_COL_SUS} ILIKE %s'
+    _UPDATE_SUS = f'UPDATE {_TABLE_NAME} SET {_COL_SUS} = %s, {_COL_PACIENTE_ID} = %s, {_COL_DATA_INICIO} = %s, {_COL_DATA_FINAL} = %s WHERE {_COL_ID} = %s'
+    _SELECT_BY_SUS = f'SELECT {_COL_PACIENTE_ID}, {_COL_SUS}, {_COL_DATA_INICIO}, {_COL_DATA_FINAL} from {_TABLE_NAME} WHERE {_COL_SUS} ILIKE %s'
     _SELECT_ALL = f'SELECT * from {_TABLE_NAME}'
-    _SELECT_BY_SUS_ID = f'SELECT p.* from {_TABLE_NAME_PACIENTE} p INNER JOIN {_TABLE_NAME} h ON p.{_COL_ID} = h.{_COL_PACIENTE_ID} WHERE h.{_COL_PACIENTE_ID} = %s'
+    _SELECT_BY_SUS_ID = f'SELECT {_COL_SUS} from {_TABLE_NAME} WHERE {_COL_PACIENTE_ID} = %s'
+    _SELECT_ID_BY_SUS = f'SELECT {_COL_ID} from {_TABLE_NAME} WHERE {_COL_SUS} = %s'
+    _SELECT_NULL_DATA_FINAL = f'SELECT COUNT(*) FROM {_TABLE_NAME} WHERE {_COL_PACIENTE_ID} = %s AND {_COL_DATA_FINAL} IS NULL;'

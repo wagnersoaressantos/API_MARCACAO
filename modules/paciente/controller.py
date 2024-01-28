@@ -4,11 +4,12 @@ from modules.comuns.controller import ControllerComuns
 from modules.paciente.dao import DAOPaciente
 from modules.paciente.modelo import Paciente
 from modules.paciente.sql import SQLPaciente
-from modules.sus.controller import ControllerSus
+# from modules.sus.controller import ControllerSus
+from modules.sus.modelo import Sus
 
 paciente_controller = Blueprint('paciente_controller', __name__)
 dao_paciente = DAOPaciente()
-sus_controller = ControllerSus()
+# sus_controller = ControllerSus()
 comuns_controller = ControllerComuns()
 module_name = 'paciente'
 
@@ -19,7 +20,6 @@ def create_paciente():
         for campo in SQLPaciente._CAMPOS_OBRIGATORIOS:
             if campo not in data.keys() or not data.get(campo, '').strip():
                 erros.append(f'O campo {campo} é obrigatorio')
-        print('verificando se o cpf existe')
         if dao_paciente.get_by_cpf(data.get('cpf')):
             erros.append(f'já tem cadastro')
         if erros:
@@ -34,10 +34,15 @@ def create_paciente():
             paciente_dados = {chave: valor for chave, valor in data.items() if chave != 'sus'}
             paciente = Paciente(**paciente_dados)
             paciente = dao_paciente.salvar(paciente)
-            print('pegando cpf para pegar o id do paciente para adicionar o sus ao hitorico')
-            print('cpf informado: ', paciente.cpf)
             paciente_id = comuns_controller.get_id_paciente_by_cpf(paciente.cpf)
             print('id do paciente: ',paciente_id)
+            print('sus informado: ', data.get('sus'))
+            sus_novo = data.get('sus')
+            print(f'solicitando adição do sus: {sus_novo} ao historico do sus')
+            params = {'sus': sus_novo, 'paciente_id': paciente_id }
+            print('params: ', params)
+            dados_sus = sus_controller.create_sus(**params)
+            print('dados adicionados: ', dados_sus)
         print(paciente)
     response = jsonify('sucesso')
     response.status_code = 201
@@ -45,24 +50,30 @@ def create_paciente():
 
 def atualizar_paciente():
     pacientes = request.json
-    print("paciente a atualizar: ", pacientes)
     for data in pacientes:
         if'cpf' in data:
             if data.get('cpf')!="":
-                print('pegando id')
                 id = comuns_controller.get_id_paciente_by_cpf(data.get('cpf'))
-                print('id: ',id)
-                print('atualizando paciente com id: ',id)
                 paciente_novo = Paciente(data.get('nome'), data.get('mae'), data.get('data_nasc'), data.get('pai'), id)
-                print(f'nova paciente para atualizar: {paciente_novo}')
-                dao_paciente.atualizar(paciente_novo)
+                if not 'sus' in data:
+                    dao_paciente.atualizar(paciente_novo)
+                else:
+                    dao_paciente.atualizar(paciente_novo)
+                    paciente_id = comuns_controller.get_id_paciente_by_cpf(data.get('cpf'))
+                    sus_novo = data.get('sus')
+                    print(f'solicitando adição do sus: {sus_novo} ao historico do sus')
+                    params = {'sus': sus_novo, 'paciente_id': paciente_id}
+                    print('params: ', params)
+                    dados_sus = sus_controller.create_sus(**params)
+                    print('dados adicionados: ', dados_sus)
+                    paciente_novo.adiciona_sus_no_historico(dados_sus)
+                print(paciente_novo)
             else:
                 response = jsonify("Informe o CPF")
                 return response
         else:
             response = jsonify("Informe o CPF para relizar a atualização")
             return response
-    print(f'paciente atualizado')
     response = jsonify("sucesso na atualização")
     return response
 
@@ -165,12 +176,10 @@ def get_or_create_paciente():
     if request.method == 'GET':
         return get_paciente()
     else:
-        print("criar paciente")
         return create_paciente()
 
 @paciente_controller.route(f'/{module_name}/atualizar/', methods = ['POST'])
 def get_atualizar_paciente():
-    print("entrou no atualizar paciente")
     return atualizar_paciente()
 # # def get_or_create_sus():
 # #    print("pegando sus sus")
