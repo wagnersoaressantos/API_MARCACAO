@@ -62,11 +62,12 @@ def create_sus(paciente_id=None, sus_novo=None):
     print(f'verificando hitorico pelo id do paciente {paciente_id}')
     historico = dao_sus.get_by_sus_paciente_id(paciente_id)
     print('historico: ', historico)
-    # if historico:
-    #     print('No if do historico')
-    #     print('historico do sus: ', historico)
-    # print('pegando data para adicionar o sus ao historico')
-    # dataInicio = datetime.now().strftime("%d/%m/%Y")
+    if historico:
+        print('No if do historico')
+        print('pegando data para adicionar A DATA FINAL o sus ao historico')
+        dataFinal = datetime.now().strftime("%d/%m/%Y")
+        print(f'data final é {dataFinal}')
+        update_data_final_if_null(paciente_id,dataFinal)
     # print('pegando data Inicio', dataInicio)
     # data_inicio_sus_novo = dataInicio
     # print(f'data inicial: {data_inicio_sus_novo}')
@@ -78,6 +79,17 @@ def create_sus(paciente_id=None, sus_novo=None):
     response = jsonify('No create SUS!')
     response.status_code = 201
     return response
+
+def update_data_final_if_null(paciente_id, nova_data_final):
+    if dao_sus.check_null_data_final(paciente_id):
+        print(f'tem sus com data final Null a nova data final sera {nova_data_final} para o paciente com id {paciente_id}')
+        sus_list = dao_sus.list_sus_null_data_final(paciente_id)
+        print(f'lista de sus com data final null para p paciente com id {paciente_id} : {sus_list}')
+        for sus in sus_list:
+            print(f'no for o sus com data final null é {sus}')
+            atualizar_sus = dao_sus.update_sus_null_data_final(sus, nova_data_final)
+            print(f'atualizar_sus retornol {atualizar_sus}')
+
 
 def get_sus():
     sus_all = dao_sus.get_all()

@@ -54,3 +54,24 @@ class DAOSus(SQLSus):
             return results
         else:
             return None
+
+    def check_null_data_final(self, paciente_id):
+        query = self._SELECT_NULL_DATA_FINAL
+        cursor = self.connection.cursor()
+        cursor.execute(query, (paciente_id,))
+        results = cursor.fetchone()
+        return results[0] > 0
+
+    def list_sus_null_data_final(self, paciente_id):
+        query = self._LIST_SUS_NULL_DATA_FINAL
+        cursor = self.connection.cursor()
+        cursor.execute(query, (paciente_id,))
+        sus_list = cursor.fetchall()
+        return sus_list
+
+    def update_sus_null_data_final(self, sus, data_final):
+        query = self._UPDATE_SUS
+        cursor = self.connection.cursor()
+        cursor.execute(query, (data_final, sus))
+        self.connection.commit()
+        return 'sucesso'
