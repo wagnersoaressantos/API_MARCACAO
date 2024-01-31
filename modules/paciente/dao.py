@@ -111,11 +111,11 @@ class DAOPaciente(SQLPaciente):
         query = self._SELECT_BY_ID
         cursor = self.connection.cursor()
         cursor.execute(query, (paciente_id,))
-        results = cursor.fetchone()
-        if results:
+        result = cursor.fetchone()
+        if result:
             cols = [desc[0] for desc in cursor.description]
-            results = dict(zip(cols, results))
-            results = Paciente(**results)
-            return results
+            result_dict = dict(zip(cols, result))
+            result = Paciente(**result_dict)
+            return result
         else:
             return None

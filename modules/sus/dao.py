@@ -30,28 +30,25 @@ class DAOSus(SQLSus):
         results = [Sus(**i) for i in results]
         return results
 
-    def get_by_sus(self, sus):
+    def get_paciente_by_sus(self, sus):
         query = self._SELECT_BY_SUS
         cursor = self.connection.cursor()
         cursor.execute(query, (sus,))
         results = cursor.fetchall()
         if results:
-            cols = [desc[0] for desc in cursor.description]
-            results = [dict(zip(cols, i)) for i in results]
-            results = [Sus(**i) for i in results]
-            print('results sus = ', results)
-            return results
+            return results[0]
         else:
             return None
 
-    def get_by_sus_paciente_id(self, paciente_id):
+    def get_sus_by_paciente_id(self, paciente_id):
         query = self._SELECT_BY_SUS_ID
         cursor = self.connection.cursor()
         cursor.execute(query, (paciente_id,))
         results = cursor.fetchall()
-        print('result do get_by_sus_paciente_id: ', results[0])
+        # print('result do get_by_sus_paciente_id: ', results[0])
         if results:
-            return results
+            sus_list = [sus[0] for sus in results]
+            return sus_list
         else:
             return None
 
@@ -75,3 +72,9 @@ class DAOSus(SQLSus):
         cursor.execute(query, (data_final, sus))
         self.connection.commit()
         return 'sucesso'
+
+    def delete_sus_by_paciente_id(self, id):
+        query = self._DELETE_BY_ID_PACIENTE
+        cursor = self.connection.cursor()
+        cursor.execute(query, (id,))
+        self.connection.commit()

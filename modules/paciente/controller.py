@@ -4,12 +4,12 @@ from modules.comuns.controller import ControllerComuns
 from modules.paciente.dao import DAOPaciente
 from modules.paciente.modelo import Paciente
 from modules.paciente.sql import SQLPaciente
-# from modules.sus.controller import ControllerSus
+from modules.sus.controller import ControllerSus
 from modules.sus.modelo import Sus
 
 paciente_controller = Blueprint('paciente_controller', __name__)
 dao_paciente = DAOPaciente()
-# sus_controller = ControllerSus()
+sus_controller = ControllerSus()
 comuns_controller = ControllerComuns()
 module_name = 'paciente'
 
@@ -41,7 +41,7 @@ def create_paciente():
             print(f'solicitando adição do sus: {sus_novo} ao historico do sus')
             params = {'sus': sus_novo, 'paciente_id': paciente_id }
             print('params: ', params)
-            dados_sus = sus_controller.create_sus(**params)
+            dados_sus = sus_controller.pegar_dados()
             print('dados adicionados: ', dados_sus)
         print(paciente)
     response = jsonify('sucesso')
@@ -64,7 +64,7 @@ def atualizar_paciente():
                     print(f'solicitando adição do sus: {sus_novo} ao historico do sus')
                     params = {'sus': sus_novo, 'paciente_id': paciente_id}
                     print('params: ', params)
-                    dados_sus = sus_controller.create_sus(**params)
+                    dados_sus = sus_controller.pegar_dados()
                     print('dados adicionados: ', dados_sus)
                     paciente_novo.adiciona_sus_no_historico(dados_sus)
                 print(paciente_novo)
@@ -151,12 +151,22 @@ def get_paciente_by_data_nasc(data_nasc):
         response.status_code = 404
         return response
 
-# def get_paciente_by_sus(sus):
-#     pacientes = sus_controller.get_by_sus(sus)
-#     results = [paciente.__dict__ for paciente in pacientes]
-#     response = jsonify(results)
-#     response.status_code = 200
-#     return response
+def get_paciente_by_sus(sus):
+    paciente_id = sus_controller.get_paciente_by_sus(sus)
+    resultado_paciente = dao_paciente.get_by_id(paciente_id)
+    list_sus = sus_controller.get_sus_by_paciente_id(paciente_id)
+    if list_sus:
+        for sus in list_sus:
+            resultado_paciente.adiciona_sus_no_historico(sus)
+    if resultado_paciente:
+        result = resultado_paciente.__dict__
+        response = jsonify(result)
+        response.status_code = 200
+        return response
+    else:
+        response = jsonify('nenhum resultado encontrado')
+        response.status_code = 404
+        return response
 
 def buscar_paciente(nome = None, mae = None, sus = None, data_nasc = None, cpf = None):
 
@@ -181,14 +191,7 @@ def get_or_create_paciente():
 @paciente_controller.route(f'/{module_name}/atualizar/', methods = ['POST'])
 def get_atualizar_paciente():
     return atualizar_paciente()
-# # def get_or_create_sus():
-# #    print("pegando sus sus")
-# #    if request.method == 'GET':
-# #        pass
-# #    else:
-# #        print("adicionando sus")
-# #        return sus_controller.create_sus()
-#
+
 @paciente_controller.route(f'/{module_name}/buscar/', methods = ['GET'])
 def get_buscar_paciente():
     nome = request.args.get('nome')
@@ -203,12 +206,9 @@ def get_buscar_paciente():
 
     results = buscar_paciente(**params)
     return results
-
-@paciente_controller.route(f'/{module_name}/deletar/', methods = ['DELETE'])
-def delete_demanda():
-    cpf = request.args.get('cpf')
-    param = {'cpf':cpf}
-    paciente = buscar_paciente(**param)
-    print(paciente)
-    results = delete_paciente(cpf)
-    return results
+#
+# @paciente_controller.route(f'/{module_name}/deletar/', methods = ['DELETE'])
+# def delete_paciente():
+#     cpf = request.args.get('cpf')
+#     results = delete_paciente(cpf)
+#     return results

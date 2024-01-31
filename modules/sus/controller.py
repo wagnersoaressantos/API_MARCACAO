@@ -13,141 +13,106 @@ from modules.sus.sql import SQLSus
 sus_controller = Blueprint('sus_controller', __name__)
 comuns_controller = ControllerComuns()
 dao_sus = DAOSus()
-dao_paciente = DAOPaciente()
 module_name = 'sus'
 
-# class ControllerSus:
-def pegar_dados():
-    dados = request.json
-    print('peganco os dados')
-    print(dados)
-    erros = []
-    print('entrando no for para pegar os dados')
-    for data in dados:
-        print('no for',data)
-        for campo in SQLSus._CAMPOS_OBRIGATORIOS:
-            if campo not in data.keys() or not data.get(campo, '').strip():
-                erros.append(f'O campo {campo} é obrigatorio')
-        if dao_sus.get_by_sus(data.get('sus')):
-            erros.append(f'Este sus já tem cadastro')
-        if not data.get('cpf', '').strip():
-            erros.append(f'O campo cpf é obrigatorio')
-        if erros:
-            response = jsonify(erros)
-            response.status_code = 401
-            print(response)
-            return response
-
-        paciente_id = comuns_controller.get_id_paciente_by_cpf(data.get('cpf'))
-        print('id do paciente: ', paciente_id)
-        if paciente_id:
+class ControllerSus:
+    def pegar_dados(self):
+        dados = request.json
+        erros = []
+        for data in dados:
+            for campo in SQLSus._CAMPOS_OBRIGATORIOS:
+                if campo not in data.keys() or not data.get(campo, '').strip():
+                    erros.append(f'O campo {campo} é obrigatorio')
+            if dao_sus.get_by_sus(data.get('sus')):
+                erros.append(f'Este sus já tem cadastro')
+            if not data.get('cpf', '').strip():
+                erros.append(f'O campo cpf é obrigatorio')
+            if erros:
+                response = jsonify(erros)
+                response.status_code = 401
+                return response
+            paciente_id = comuns_controller.get_id_paciente_by_cpf(data.get('cpf'))
+            if not paciente_id:
+                response = jsonify('paciente não encontrado ou sem cadastro')
+                response.status_code = 404
+                return response
             sus_novo = data.get('sus')
-            print(f'solicitando adição do sus: {sus_novo} ao historico do sus')
-            params = {'sus': sus_novo, 'paciente_id': paciente_id}
-            print('params: ', params)
-            create_sus(paciente_id, sus_novo)
+            self.create_sus(paciente_id, sus_novo)
+        response = jsonify('sucesso')
+        response.status_code = 201
+        return response
 
-            # dados_sus = sus_controller.create_sus(**params)
-    #         print('dados adicionados: ', dados_sus)
-    #     print(paciente)
-    # response = jsonify('sucesso')
-    # response.status_code = 201
-    return jsonify('dados pegos!')
+    def create_sus(self, paciente_id, sus_novo):
+        historico = dao_sus.get_by_sus_paciente_id(paciente_id)
+        if historico:
+            dataInicio = datetime.now().strftime("%d/%m/%Y")
+            dataFinal = dataInicio
+            self.update_data_final_if_null(paciente_id, dataFinal)
+            data_final_sus_novo = None
+            sus_novo = Sus(sus_novo, paciente_id,dataInicio,data_final_sus_novo)
+            dao_sus.salvar(sus_novo)
+            response = jsonify('Sus adicionado com sucesso!')
+            response.status_code = 201
+            return response
+        dataInicio = datetime.now().strftime("%d/%m/%Y")
+        data_final_sus_novo = None
+        sus_novo = Sus(sus_novo, paciente_id, dataInicio, data_final_sus_novo)
+        dao_sus.salvar(sus_novo)
+        response = jsonify('Sus adicionado com sucesso!')
+        response.status_code = 201
+        return response
 
-def create_sus(paciente_id=None, sus_novo=None):
-    params = {'paciente_id': paciente_id, 'sus': sus_novo}
-    print(params)
-    sus_data = params
-    print('em criar sus:',sus_data)
-    print(f'verificando hitorico pelo id do paciente {paciente_id}')
-    historico = dao_sus.get_by_sus_paciente_id(paciente_id)
-    print('historico: ', historico)
-    if historico:
-        print('No if do historico')
-        print('pegando data para adicionar A DATA FINAL o sus ao historico')
-        dataFinal = datetime.now().strftime("%d/%m/%Y")
-        print(f'data final é {dataFinal}')
-        update_data_final_if_null(paciente_id,dataFinal)
-    # print('pegando data Inicio', dataInicio)
-    # data_inicio_sus_novo = dataInicio
-    # print(f'data inicial: {data_inicio_sus_novo}')
-    # data_final_sus_novo = None
-    # sus_novo = Sus(sus, paciente_id,data_inicio_sus_novo,data_final_sus_novo)
-    # sus_novo = dao_sus.salvar(sus_novo)
-    # print("novo sus é: ",sus_novo)
-    # response = jsonify('Sus adicionado ecom sucesso!')
-    response = jsonify('No create SUS!')
-    response.status_code = 201
-    return response
+    def update_data_final_if_null(self, paciente_id, nova_data_final):
+        if dao_sus.check_null_data_final(paciente_id):
+            sus_list = dao_sus.list_sus_null_data_final(paciente_id)
+            for sus in sus_list:
+                dao_sus.update_sus_null_data_final(sus, nova_data_final)
+            return
+        return
 
-def update_data_final_if_null(paciente_id, nova_data_final):
-    if dao_sus.check_null_data_final(paciente_id):
-        print(f'tem sus com data final Null a nova data final sera {nova_data_final} para o paciente com id {paciente_id}')
-        sus_list = dao_sus.list_sus_null_data_final(paciente_id)
-        print(f'lista de sus com data final null para p paciente com id {paciente_id} : {sus_list}')
-        for sus in sus_list:
-            print(f'no for o sus com data final null é {sus}')
-            atualizar_sus = dao_sus.update_sus_null_data_final(sus, nova_data_final)
-            print(f'atualizar_sus retornol {atualizar_sus}')
+    def delete_sus(cpf):
+        id = comuns_controller.get_id_paciente_by_cpf(cpf)
+        if not id:
+            response = jsonify({"message":"Paciente não encontrado!"})
+            response.status_code = 404
+            return response
+        dao_sus.delete_sus_by_paciente_id(id)
+        response = jsonify({"message": "Paciente e SUS deletado com sucesso!"})
+        response.status_code = 200
+        return response
 
-
-def get_sus():
-    sus_all = dao_sus.get_all()
-    results = [sus.__dict__ for sus in sus_all]
-    response = jsonify(results)
-    response.status_code = 200
-    return response
-
-def buscar_sus(sus = None):
-    if sus:
-        return get_by_sus(sus)
-    return get_sus()
-def get_by_sus(self, sus):
-    sus_ = dao_paciente.get_by_nome(nome)
-    if pacientes:
-        results = [paciente.__dict__ for paciente in pacientes]
+    def get_sus(self):
+        sus_all = dao_sus.get_all()
+        results = [sus.__dict__ for sus in sus_all]
         response = jsonify(results)
         response.status_code = 200
         return response
-    else:
-        response = jsonify('nenhum resultado encontrado')
-        response.status_code = 404
-        return response
+    def get_sus_by_paciente_id(self, paciente_id):
+        sus_list = dao_sus.get_sus_by_paciente_id(paciente_id)
+        return sus_list
 
-@sus_controller.route(f'/{module_name}/', methods=['GET', 'POST'])
-def get_or_create_sus():
-    if request.method == 'GET':
-        return get_sus()
-    else:
-        return pegar_dados()
+    def get_paciente_by_sus(self, sus):
+        return dao_sus.get_paciente_by_sus(sus)
 
-@sus_controller.route(f'/{module_name}/atualizar/', methods=['POST'])
-def get_atualizar_paciente():
-    return atualizar_paciente()
 
-    # # def get_or_create_sus():
-    # #    print("pegando sus sus")
-    # #    if request.method == 'GET':
-    # #        pass
-    # #    else:
-    # #        print("adicionando sus")
-    # #        return sus_controller.create_sus()
 
-    # @paciente_controller.route(f'/{module_name}/deletar/', methods=['DELETE'])
-    # def delete_demanda():
-    #     cpf = request.args.get('cpf')
-    #     param = {'cpf': cpf}
-    #     paciente = buscar_paciente(**param)
-    #     print(paciente)
-    #     results = delete_paciente(cpf)
-    #     return results
+    def listar_sus_ou_pegar_id_paciente(self,sus = None):
+        if sus:
+            return dao_sus.get_paciente_by_sus(sus)
+        return self.get_sus()
 
-    @sus_controller.route(f'/{module_name}/buscar/', methods=['GET'])
-    def get_buscar_sus():
-        sus = request.args.get('sus')
-
-        # cria um dicionario
-        params = {'sus': sus}
-        # params = {chave: valor for chave, valor in params.items() if valor is not None}
-        results = buscar_sus(**params)
-        return results
+# @sus_controller.route(f'/{module_name}/', methods=['GET', 'POST'])
+# def get_or_create_sus(self):
+#     if request.method == 'GET':
+#         return self.get_sus()
+#     else:
+#         return self.pegar_dados()
+#
+# @sus_controller.route(f'/{module_name}/buscar/', methods=['GET'])
+# def get_buscar_sus(self):
+#     sus = request.args.get('sus')
+#     # cria um dicionario
+#     params = {'sus': sus}
+#     # params = {chave: valor for chave, valor in params.items() if valor is not None}
+#     results = self.buscar_sus(**params)
+#     return results
