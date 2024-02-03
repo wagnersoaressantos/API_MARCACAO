@@ -16,6 +16,7 @@ dao_sus = DAOSus()
 module_name = 'sus'
 
 class ControllerSus:
+
     def pegar_dados(self):
         dados = request.json
         erros = []
@@ -23,7 +24,7 @@ class ControllerSus:
             for campo in SQLSus._CAMPOS_OBRIGATORIOS:
                 if campo not in data.keys() or not data.get(campo, '').strip():
                     erros.append(f'O campo {campo} é obrigatorio')
-            if dao_sus.get_by_sus(data.get('sus')):
+            if dao_sus.get_by_sus(data.get("sus")):
                 erros.append(f'Este sus já tem cadastro')
             if not data.get('cpf', '').strip():
                 erros.append(f'O campo cpf é obrigatorio')
@@ -43,7 +44,7 @@ class ControllerSus:
         return response
 
     def create_sus(self, paciente_id, sus_novo):
-        historico = dao_sus.get_by_sus_paciente_id(paciente_id)
+        historico = dao_sus.get_sus_by_paciente_id(paciente_id)
         if historico:
             dataInicio = datetime.now().strftime("%d/%m/%Y")
             dataFinal = dataInicio
@@ -93,8 +94,6 @@ class ControllerSus:
 
     def get_paciente_by_sus(self, sus):
         return dao_sus.get_paciente_by_sus(sus)
-
-
 
     def listar_sus_ou_pegar_id_paciente(self,sus = None):
         if sus:

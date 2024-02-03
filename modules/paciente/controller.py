@@ -59,15 +59,8 @@ def atualizar_paciente():
                     dao_paciente.atualizar(paciente_novo)
                 else:
                     dao_paciente.atualizar(paciente_novo)
-                    paciente_id = comuns_controller.get_id_paciente_by_cpf(data.get('cpf'))
-                    sus_novo = data.get('sus')
-                    print(f'solicitando adição do sus: {sus_novo} ao historico do sus')
-                    params = {'sus': sus_novo, 'paciente_id': paciente_id}
-                    print('params: ', params)
                     dados_sus = sus_controller.pegar_dados()
-                    print('dados adicionados: ', dados_sus)
                     paciente_novo.adiciona_sus_no_historico(dados_sus)
-                print(paciente_novo)
             else:
                 response = jsonify("Informe o CPF")
                 return response
@@ -87,14 +80,6 @@ def delete_paciente(cpf):
     response = jsonify({"message": "Paciente deletado com sucesso!"})
     response.status_code = 200
     return response
-#     if 'sus' in pacientes:
-#         paciente_info = {k: v for k, v in pacientes.items() if k!='sus'}
-#         paciente = buscar_paciente(paciente_info.get('cpf'))
-#         paciente_id = paciente[0]
-#         print(paciente_id)
-#         if not paciente:
-#             paciente = create_paciente(paciente_info)
-#             paciente_id = paciente
 
 def get_paciente():
     pacientes = dao_paciente.get_all()
@@ -181,6 +166,7 @@ def buscar_paciente(nome = None, mae = None, sus = None, data_nasc = None, cpf =
     if sus:
         return get_paciente_by_sus(sus)
     return get_paciente()
+
 @paciente_controller.route(f'/{module_name}/', methods = ['GET', 'POST'])
 def get_or_create_paciente():
     if request.method == 'GET':

@@ -30,6 +30,17 @@ class DAOSus(SQLSus):
         results = [Sus(**i) for i in results]
         return results
 
+    def get_by_sus(self, sus):
+        query = self._SELECT_SUS
+        cursor = self.connection.cursor()
+        cursor.execute(query, (sus,))
+        results = cursor.fetchall()
+        if results:
+            sus_list = [sus[0] for sus in results]
+            return sus_list
+        else:
+            return None
+
     def get_paciente_by_sus(self, sus):
         query = self._SELECT_BY_SUS
         cursor = self.connection.cursor()
