@@ -5,6 +5,7 @@ from modules.sus.dao import DAOSus
 dao_demanda = DAODemanda()
 dao_paciente = DAOPaciente()
 dao_sus = DAOSus()
+
 class ControllerComuns():
     def get_id_paciente_by_cpf(Self, cpf):
         id = dao_paciente.get_id_by_cpf(cpf)
