@@ -15,5 +15,7 @@ class ControllerComuns():
         return id
 
     def get_id_sus_by_sus(self, sus):
-        id = dao_sus.get_id_by_sus()
+        id = dao_sus.get_id_by_sus(sus)
+        return id
+
 
