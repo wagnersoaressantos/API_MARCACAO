@@ -34,7 +34,6 @@ class DAOPaciente(SQLPaciente):
         cursor.execute(query, (id,))
         self.connection.commit()
 
-
     def get_all(self):
         query = self._SELECT_ALL
         cursor = self.connection.cursor()

@@ -5,7 +5,6 @@ from modules.paciente.dao import DAOPaciente
 from modules.paciente.modelo import Paciente
 from modules.paciente.sql import SQLPaciente
 from modules.sus.controller import ControllerSus
-from modules.sus.modelo import Sus
 
 paciente_controller = Blueprint('paciente_controller', __name__)
 dao_paciente = DAOPaciente()

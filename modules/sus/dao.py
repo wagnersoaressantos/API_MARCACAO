@@ -42,7 +42,7 @@ class DAOSus(SQLSus):
             return None
 
     def get_paciente_by_sus(self, sus):
-        query = self._SELECT_BY_SUS
+        query = self._SELECT_PACIENTE_ID_BY_SUS
         cursor = self.connection.cursor()
         cursor.execute(query, (sus,))
         results = cursor.fetchall()
@@ -89,3 +89,13 @@ class DAOSus(SQLSus):
         cursor = self.connection.cursor()
         cursor.execute(query, (id,))
         self.connection.commit()
+
+    def get_id_by_sus(self, sus):
+        query = self._SELECT_ID_BY_SUS
+        cursor = self.connection.cursor()
+        cursor.execute(query, (sus,))
+        result = cursor.fetchone()
+        if result:
+            return result[0]
+        else:
+            return None
