@@ -19,4 +19,8 @@ class ControllerComuns():
         id = dao_sus.get_id_by_sus(sus)
         return id
 
+    def get_sus_by_paciente_id(self, paciente_id):
+        sus = dao_sus.get_sus_by_paciente_id(paciente_id)
+        return sus
+
 
