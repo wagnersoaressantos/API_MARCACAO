@@ -15,7 +15,7 @@ class DAOMarcacao(SQLMarcacao):
             raise Exception("Tipo inválido")
         query = self._INSERTO_INTO
         cursor = self.connection.cursor()
-        cursor.execute(query,(marcacao.id_sus, marcacao.paciente_id, marcacao.id_demanda, marcacao.data_solicitacao, marcacao.data_marcacao))
+        cursor.execute(query,(marcacao.sus, marcacao.cpf, marcacao.id_demanda, marcacao.data_solicitacao, marcacao.data_marcacao))
         self.connection.commit()
         return marcacao
 

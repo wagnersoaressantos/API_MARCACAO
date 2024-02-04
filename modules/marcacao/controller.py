@@ -1,8 +1,8 @@
 from datetime import datetime
 from flask import Blueprint, jsonify, request
 from modules.comuns.controller import ControllerComuns
-from pip._internal.utils import datetime
 from modules.marcacao.dao import DAOMarcacao
+from modules.marcacao.modelo import Marcacao
 from modules.marcacao.sql import SQLMarcacao
 # from modules.paciente.dao import DAOPaciente
 # from modules.sus.dao import DAOSus
@@ -18,10 +18,8 @@ module_name = 'marcacao'
 
 def pegar_dados():
     dados = request.json
-    print(f'pegando dados  para marcação os dados são: {dados}')
     erros = []
     for data in dados:
-        print(f'no for pegando dado {data}')
         for campo in SQLMarcacao._CAMPOS_OBRIGATORIOS:
             if campo not in data.keys() or not data.get(campo, '').strip():
                 erros.append(f'O campo {campo} é obrigatorio')
@@ -38,40 +36,50 @@ def pegar_dados():
                 response.status_code = 401
                 return response
         paciente_id = comuns_controller.get_id_paciente_by_cpf(data.get('cpf'))
-        print(f'pegando id do paciente pelo cpf o id é : {paciente_id}')
         if not paciente_id:
             response = jsonify('paciente não encontrado ou sem cadastro')
             response.status_code = 404
             return response
-        print('verificando se o sus pertence ao paciente')
         id_sus = comuns_controller.get_id_sus_by_sus(data.get('sus'))
         if not id_sus:
             response = jsonify('sus não encontrado ou sem cadastro')
             response.status_code = 404
             return response
-        print(f'pegando id do sus do paciente sus: {id_sus}')
-        print('buscando sus pelo id do paciente')
         sus_cadastrado = comuns_controller.get_sus_by_paciente_id(paciente_id)
-        print(f'sus pertecente ao paciente é: {sus_cadastrado}')
         for sus in sus_cadastrado:
             if sus == data.get('sus'):
                 validador_sus = True
+                break
             else:
                 validador_sus = False
         if not validador_sus:
-            response = jsonify('sus não pertence a esse paciente')
+            response = jsonify('sus informado errado ou não pertence a esse paciente!')
             response.status_code = 404
             return response
+        id_demanda = comuns_controller.get_id_demanda_by_demanda(data.get('demanda'))
+        if not id_demanda:
+            response = jsonify('Demanda não encontrada, foi informada errada ou não está cadastrada!')
+            response.status_code = 404
+            return response
+        if 'data_solicitacao' in data:
+            if not data.get('data_solicitacao', '').strip():
+                create_marcacao(data.get('sus'), data.get('cpf'), id_demanda)
+            else:
+                create_marcacao(data.get('sus'), data.get('cpf'), id_demanda, data_solicitação=data.get('data_solicitacao'))
+        else:
+            create_marcacao(data.get('sus'), data.get('cpf'), id_demanda)
 
-
-
-#             sus_novo = data.get('sus')
-#             self.create_sus(paciente_id, sus_novo)
         response = jsonify('sucesso')
         response.status_code = 201
         return response
-#
-#     def create_sus(self, paciente_id, sus_novo):
+
+def create_marcacao(sus, cpf, demanda_id, data_solicitação = None):
+
+    if not data_solicitação:
+        data_solicitação = datetime.now().strftime("%d/%m/%Y")
+        marcacao = Marcacao(sus, cpf, demanda_id, data_solicitação)
+        dao_marcacao.salvar(marcacao)
+
 #         historico = dao_sus.get_sus_by_paciente_id(paciente_id)
 #         if historico:
 #             dataInicio = datetime.now().strftime("%d/%m/%Y")
@@ -87,9 +95,9 @@ def pegar_dados():
 #         data_final_sus_novo = None
 #         sus_novo = Sus(sus_novo, paciente_id, dataInicio, data_final_sus_novo)
 #         dao_sus.salvar(sus_novo)
-#         response = jsonify('Sus adicionado com sucesso!')
-#         response.status_code = 201
-#         return response
+    response = jsonify('Macarcao adicionado com sucesso!')
+    response.status_code = 201
+    return response
 #
 #     def update_data_final_if_null(self, paciente_id, nova_data_final):
 #         if dao_sus.check_null_data_final(paciente_id):
