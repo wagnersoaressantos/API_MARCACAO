@@ -46,7 +46,7 @@ class DAODemanda(SQLDemanda):
         else:
             return None
 
-
+    # noinspection DuplicatedCode
     def get_all(self):
         query = self._SELECT_ALL
         cursor = self.connection.cursor()

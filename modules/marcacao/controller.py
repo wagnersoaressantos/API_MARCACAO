@@ -17,6 +17,7 @@ module_name = 'marcacao'
 # class ControllerMarcacao:
 
 def pegar_dados():
+    global validador_sus
     dados = request.json
     erros = []
     for data in dados:
@@ -52,6 +53,7 @@ def pegar_dados():
                 break
             else:
                 validador_sus = False
+
         if not validador_sus:
             response = jsonify('sus informado errado ou não pertence a esse paciente!')
             response.status_code = 404
@@ -63,42 +65,29 @@ def pegar_dados():
             return response
         if 'data_solicitacao' in data:
             if not data.get('data_solicitacao', '').strip():
-                create_marcacao(data.get('sus'), data.get('cpf'), id_demanda)
+                result = create_solicitacao_marcacao(data.get('sus'), data.get('cpf'), id_demanda)
             else:
-                create_marcacao(data.get('sus'), data.get('cpf'), id_demanda, data_solicitação=data.get('data_solicitacao'))
+                result = create_solicitacao_marcacao(data.get('sus'), data.get('cpf'), id_demanda, data_solicitação=data.get('data_solicitacao'))
         else:
-            create_marcacao(data.get('sus'), data.get('cpf'), id_demanda)
-
-        response = jsonify('sucesso')
+            result = create_solicitacao_marcacao(data.get('sus'), data.get('cpf'), id_demanda)
+        response = jsonify(result)
         response.status_code = 201
         return response
 
-def create_marcacao(sus, cpf, demanda_id, data_solicitação = None):
+
+def create_solicitacao_marcacao(sus, cpf, demanda_id, data_solicitação = None):
 
     if not data_solicitação:
         data_solicitação = datetime.now().strftime("%d/%m/%Y")
         marcacao = Marcacao(sus, cpf, demanda_id, data_solicitação)
         dao_marcacao.salvar(marcacao)
-
-#         historico = dao_sus.get_sus_by_paciente_id(paciente_id)
-#         if historico:
-#             dataInicio = datetime.now().strftime("%d/%m/%Y")
-#             dataFinal = dataInicio
-#             self.update_data_final_if_null(paciente_id, dataFinal)
-#             data_final_sus_novo = None
-#             sus_novo = Sus(sus_novo, paciente_id,dataInicio,data_final_sus_novo)
-#             dao_sus.salvar(sus_novo)
-#             response = jsonify('Sus adicionado com sucesso!')
-#             response.status_code = 201
-#             return response
-#         dataInicio = datetime.now().strftime("%d/%m/%Y")
-#         data_final_sus_novo = None
-#         sus_novo = Sus(sus_novo, paciente_id, dataInicio, data_final_sus_novo)
-#         dao_sus.salvar(sus_novo)
-    response = jsonify('Macarcao adicionado com sucesso!')
+    else:
+        marcacao = Marcacao(sus, cpf, demanda_id, data_solicitação)
+        dao_marcacao.salvar(marcacao)
+    response = jsonify('Solicitação adicionado com sucesso!')
     response.status_code = 201
     return response
-#
+
 #     def update_data_final_if_null(self, paciente_id, nova_data_final):
 #         if dao_sus.check_null_data_final(paciente_id):
 #             sus_list = dao_sus.list_sus_null_data_final(paciente_id)

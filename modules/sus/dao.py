@@ -56,7 +56,6 @@ class DAOSus(SQLSus):
         cursor = self.connection.cursor()
         cursor.execute(query, (paciente_id,))
         results = cursor.fetchall()
-        # print('result do get_by_sus_paciente_id: ', results[0])
         if results:
             sus_list = [sus[0] for sus in results]
             return sus_list
