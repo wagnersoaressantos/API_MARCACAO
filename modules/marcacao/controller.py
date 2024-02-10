@@ -53,7 +53,6 @@ def pegar_dados():
                 break
             else:
                 validador_sus = False
-
         if not validador_sus:
             response = jsonify('sus informado errado ou não pertence a esse paciente!')
             response.status_code = 404
@@ -84,9 +83,7 @@ def create_solicitacao_marcacao(sus, cpf, demanda_id, data_solicitação = None)
     else:
         marcacao = Marcacao(sus, cpf, demanda_id, data_solicitação)
         dao_marcacao.salvar(marcacao)
-    response = jsonify('Solicitação adicionado com sucesso!')
-    response.status_code = 201
-    return response
+    return 'Solicitação adicionado com sucesso!'
 
 #     def update_data_final_if_null(self, paciente_id, nova_data_final):
 #         if dao_sus.check_null_data_final(paciente_id):
@@ -95,7 +92,7 @@ def create_solicitacao_marcacao(sus, cpf, demanda_id, data_solicitação = None)
 #                 dao_sus.update_sus_null_data_final(sus, nova_data_final)
 #             return
 #         return
-#
+
 #     def delete_sus(cpf):
 #         id = comuns_controller.get_id_paciente_by_cpf(cpf)
 #         if not id:
@@ -106,13 +103,13 @@ def create_solicitacao_marcacao(sus, cpf, demanda_id, data_solicitação = None)
 #         response = jsonify({"message": "Paciente e SUS deletado com sucesso!"})
 #         response.status_code = 200
 #         return response
-#
-#     def get_sus(self):
-#         sus_all = dao_sus.get_all()
-#         results = [sus.__dict__ for sus in sus_all]
-#         response = jsonify(results)
-#         response.status_code = 200
-#         return response
+
+def get_marcacoes():
+    marcacoes = dao_marcacao.get_all()
+    response = jsonify(marcacoes)
+    response.status_code = 200
+    return response
+
 #     def get_sus_by_paciente_id(self, paciente_id):
 #         sus_list = dao_sus.get_sus_by_paciente_id(paciente_id)
 #         return sus_list
@@ -128,7 +125,7 @@ def create_solicitacao_marcacao(sus, cpf, demanda_id, data_solicitação = None)
 @marcacao_controller.route(f'/{module_name}/', methods=['GET', 'POST'])
 def get_or_create_marcacao():
     if request.method == 'GET':
-        return 'no get marcacao'
+        return get_marcacoes()
     else:
         return pegar_dados()
 # #

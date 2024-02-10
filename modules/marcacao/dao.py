@@ -19,15 +19,27 @@ class DAOMarcacao(SQLMarcacao):
         self.connection.commit()
         return marcacao
 
-    # def get_all(self):
-    #     query = self._SELECT_ALL
-    #     cursor = self.connection.cursor()
-    #     cursor.execute(query)
-    #     results = cursor.fetchall()
-    #     cols = [desc[0] for desc in cursor.description]
-    #     results = [dict(zip(cols, i)) for i in results]
-    #     results = [Sus(**i) for i in results]
-    #     return results
+    def get_all(self):
+        query = self._SELECT_ALL
+        cursor = self.connection.cursor()
+        cursor.execute(query)
+        marcacoes = []
+        results = cursor.fetchall()
+        print(results)
+        for result in results:
+            print(result)
+            marcacao = {
+                'id': result[0],
+                'sus': result[1],
+                'cpf': result[2],
+                'demanda': result[3],
+                'data_solicitacao': result[4],
+                'data_marcacao': result[5]
+            }
+            marcacoes.append(marcacao)
+            print(marcacao)
+
+        return marcacoes
     #
     # def get_by_sus(self, sus):
     #     query = self._SELECT_SUS

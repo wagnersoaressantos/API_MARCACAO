@@ -8,3 +8,5 @@ class Marcacao:
         self.id_demanda = id_demanda
         self.data_solicitacao = data_solicitacao
         self.data_marcacao = data_marcacao
+    def __repr__(self):
+        return f'sus = {self.sus}, cpf = {self.cpf}, demanda = {self.id_demanda}, data solicitação = {self.data_solicitacao}, data marcacao = {self.data_marcacao}'
