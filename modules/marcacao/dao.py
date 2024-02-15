@@ -25,9 +25,7 @@ class DAOMarcacao(SQLMarcacao):
         cursor.execute(query)
         marcacoes = []
         results = cursor.fetchall()
-        print(results)
         for result in results:
-            print(result)
             marcacao = {
                 'id': result[0],
                 'sus': result[1],
@@ -37,21 +35,35 @@ class DAOMarcacao(SQLMarcacao):
                 'data_marcacao': result[5]
             }
             marcacoes.append(marcacao)
-            print(marcacao)
-
         return marcacoes
-    #
-    # def get_by_sus(self, sus):
-    #     query = self._SELECT_SUS
-    #     cursor = self.connection.cursor()
-    #     cursor.execute(query, (sus,))
-    #     results = cursor.fetchall()
-    #     if results:
-    #         sus_list = [sus[0] for sus in results]
-    #         return sus_list
-    #     else:
-    #         return None
-    #
+
+    def get_demanda_by_sus_cpf(self,id_demanda, sus, cpf):
+        query = self._SELECT_BY_SUS_OR_CPF
+        cursor = self.connection.cursor()
+        cursor.execute(query, (sus, cpf, id_demanda,))
+        marcacoes = []
+        results = cursor.fetchall()
+        for result in results:
+            marcacao = {
+                'demanda': result[0],
+                'data_solicitacao': result[1]
+            }
+            marcacoes.append(marcacao)
+        return marcacoes
+
+    def get_demanda_reprimida(self):
+        query = self._LIST_DEMANDA_REPRIMIDA
+        cursor = self.connection.cursor()
+        cursor.execute(query)
+        marcacoes = []
+        results = cursor.fetchall()
+        for result in results:
+            marcacao = {
+                'demanda': result[0],
+                'data_solicitacao': result[1]
+            }
+            marcacoes.append(marcacao)
+        return marcacoes
     # def get_paciente_by_sus(self, sus):
     #     query = self._SELECT_PACIENTE_ID_BY_SUS
     #     cursor = self.connection.cursor()
