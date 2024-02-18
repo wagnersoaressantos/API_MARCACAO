@@ -51,6 +51,22 @@ class DAOMarcacao(SQLMarcacao):
             marcacoes.append(marcacao)
         return marcacoes
 
+    def pegar_id_solicitacao(self,id_demanda, sus, cpf):
+        query = self._SELECT_ID_MARCACAO_BY_SUS_OR_CPF_DEMANDA
+        cursor = self.connection.cursor()
+        cursor.execute(query, (sus, cpf, id_demanda))
+        marcacoes = []
+        results = cursor.fetchall()
+        for result in results:
+            marcacao = {
+                'id': result[0],
+                'demanda': result[1],
+                'data_solicitacao': result[2],
+                'data_marcacao': result[3]
+            }
+            marcacoes.append(marcacao)
+        return marcacoes
+
     def get_demanda_reprimida(self):
         query = self._LIST_DEMANDA_REPRIMIDA
         cursor = self.connection.cursor()
@@ -64,61 +80,79 @@ class DAOMarcacao(SQLMarcacao):
             }
             marcacoes.append(marcacao)
         return marcacoes
-    # def get_paciente_by_sus(self, sus):
-    #     query = self._SELECT_PACIENTE_ID_BY_SUS
-    #     cursor = self.connection.cursor()
-    #     cursor.execute(query, (sus,))
-    #     results = cursor.fetchall()
-    #     if results:
-    #         return results[0]
-    #     else:
-    #         return None
-    #
-    # def get_sus_by_paciente_id(self, paciente_id):
-    #     query = self._SELECT_BY_SUS_ID
-    #     cursor = self.connection.cursor()
-    #     cursor.execute(query, (paciente_id,))
-    #     results = cursor.fetchall()
-    #     # print('result do get_by_sus_paciente_id: ', results[0])
-    #     if results:
-    #         sus_list = [sus[0] for sus in results]
-    #         return sus_list
-    #     else:
-    #         return None
-    #
-    # def check_null_data_final(self, paciente_id):
-    #     query = self._SELECT_NULL_DATA_FINAL
-    #     cursor = self.connection.cursor()
-    #     cursor.execute(query, (paciente_id,))
-    #     results = cursor.fetchone()
-    #     return results[0] > 0
-    #
-    # def list_sus_null_data_final(self, paciente_id):
-    #     query = self._LIST_SUS_NULL_DATA_FINAL
-    #     cursor = self.connection.cursor()
-    #     cursor.execute(query, (paciente_id,))
-    #     sus_list = cursor.fetchall()
-    #     return sus_list
-    #
-    # def update_sus_null_data_final(self, sus, data_final):
-    #     query = self._UPDATE_SUS
-    #     cursor = self.connection.cursor()
-    #     cursor.execute(query, (data_final, sus))
-    #     self.connection.commit()
-    #     return 'sucesso'
-    #
-    # def delete_sus_by_paciente_id(self, id):
-    #     query = self._DELETE_BY_ID_PACIENTE
-    #     cursor = self.connection.cursor()
-    #     cursor.execute(query, (id,))
-    #     self.connection.commit()
-    #
-    # def get_id_by_sus(self, sus):
-    #     query = self._SELECT_ID_BY_SUS
-    #     cursor = self.connection.cursor()
-    #     cursor.execute(query, (sus,))
-    #     result = cursor.fetchone()
-    #     if result:
-    #         return result[0]
-    #     else:
-    #         return None
+
+    def realizar_marcacao(self, id_solicitacao, data_marcacao):
+        query = self._UPDATE_MARCACAO
+        cursor = self.connection.cursor()
+        cursor.execute(query, (data_marcacao, id_solicitacao,))
+        self.connection.commit()
+        return 'sucesso'
+
+    def get_solicitacoes_all(self):
+        query = self._LISTA_SOLICITACOES_POR_PACIENTE
+        cursor = self.connection.cursor()
+        cursor.execute(query)
+        marcacoes = []
+        results = cursor.fetchall()
+        print(f'Resultado {results}')
+        for result in results:
+            marcacao = {
+                'Paciente': result[0],
+                'demanda': result[1],
+                'data_solicitacao': result[2],
+                'data_marcacao': result[3]
+            }
+            marcacoes.append(marcacao)
+        return marcacoes
+
+    def get_solicitacao_by_demanda(self, demanda_id):
+        query = self._LISTA_SOLICITACOES_POR_DEMENDA
+        cursor = self.connection.cursor()
+        cursor.execute(query, (demanda_id,))
+        marcacoes = []
+        results = cursor.fetchall()
+        print(f'Resultado {results}')
+        for result in results:
+            marcacao = {
+                'cpf paciente': result[0],
+                'demanda': result[1],
+                'data_solicitacao': result[2],
+                'data_marcacao': result[3]
+            }
+            marcacoes.append(marcacao)
+        return marcacoes
+
+    def get_solicitacao_by_cpf(self, cpf):
+        query = self._LISTA_SOLICITACOES_POR_CPF
+        cursor = self.connection.cursor()
+        cursor.execute(query, (cpf,))
+        marcacoes = []
+        results = cursor.fetchall()
+        print(f'Resultado {results}')
+        for result in results:
+            marcacao = {
+                'cpf paciente': result[0],
+                'demanda': result[1],
+                'data_solicitacao': result[2],
+                'data_marcacao': result[3]
+            }
+            marcacoes.append(marcacao)
+        return marcacoes
+
+
+    def get_solicitacao_by_sus(self, sus):
+        query = self._LISTA_SOLICITACOES_POR_SUS
+        cursor = self.connection.cursor()
+        cursor.execute(query, (sus,))
+        marcacoes = []
+        results = cursor.fetchall()
+        print(f'Resultado {results}')
+        for result in results:
+            marcacao = {
+                'paciente': result[0],
+                'demanda': result[1],
+                'data_solicitacao': result[2],
+                'data_marcacao': result[3]
+            }
+            marcacoes.append(marcacao)
+        return marcacoes
