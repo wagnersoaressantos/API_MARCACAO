@@ -128,10 +128,9 @@ class DAOMarcacao(SQLMarcacao):
         cursor.execute(query, (cpf,))
         marcacoes = []
         results = cursor.fetchall()
-        print(f'Resultado {results}')
         for result in results:
             marcacao = {
-                'cpf paciente': result[0],
+                'paciente': result[0],
                 'demanda': result[1],
                 'data_solicitacao': result[2],
                 'data_marcacao': result[3]
@@ -146,7 +145,6 @@ class DAOMarcacao(SQLMarcacao):
         cursor.execute(query, (sus,))
         marcacoes = []
         results = cursor.fetchall()
-        print(f'Resultado {results}')
         for result in results:
             marcacao = {
                 'paciente': result[0],

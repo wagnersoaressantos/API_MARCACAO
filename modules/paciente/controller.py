@@ -24,25 +24,14 @@ def create_paciente():
         if erros:
             response = jsonify(erros)
             response.status_code = 401
-            print(response)
             return response
         if not 'sus' in data:
             paciente = Paciente(**data)
-            paciente = dao_paciente.salvar(paciente)
+            dao_paciente.salvar(paciente)
         else:
             paciente_dados = {chave: valor for chave, valor in data.items() if chave != 'sus'}
             paciente = Paciente(**paciente_dados)
-            paciente = dao_paciente.salvar(paciente)
-            paciente_id = comuns_controller.get_id_paciente_by_cpf(paciente.cpf)
-            print('id do paciente: ',paciente_id)
-            print('sus informado: ', data.get('sus'))
-            sus_novo = data.get('sus')
-            print(f'solicitando adição do sus: {sus_novo} ao historico do sus')
-            params = {'sus': sus_novo, 'paciente_id': paciente_id }
-            print('params: ', params)
-            dados_sus = sus_controller.pegar_dados()
-            print('dados adicionados: ', dados_sus)
-        print(paciente)
+            dao_paciente.salvar(paciente)
     response = jsonify('sucesso')
     response.status_code = 201
     return response
